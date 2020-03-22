@@ -1,0 +1,8 @@
+{
+    "index": "data/index.json",
+    "label": "data/label.json",
+    "csv": "data/csv",
+    "transform":"separated",
+    "retain-weights":false,
+    "threshold": null
+}
