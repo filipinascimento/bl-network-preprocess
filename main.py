@@ -94,7 +94,7 @@ for entry in indexData:
 
 	if("null-models" in entry):
 		nullCount = int(entry["null-models"])
-		filenames += [(baseName+"-null_%d%s"%(i,extension),False) for i in range(nullCount)]
+		filenames += [(baseName+"-null_%d%s"%(i,extension),baseName+"-null_%d%s"%(i,extension),False) for i in range(nullCount)]
 		if(alreadySigned):
 			filenames += [(baseName+"_negative-null_%d%s"%(i,extension),baseName+"_negative-null_%d%s"%(i,extension),False) for i in range(nullCount)]
 		elif(useSeparatedSigned):
