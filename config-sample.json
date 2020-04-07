@@ -3,6 +3,6 @@
     "label": "data/label.json",
     "csv": "data/csv",
     "transform":"separated",
-    "retain-weights":false,
+    "retain-weights":true,
     "threshold": null
 }

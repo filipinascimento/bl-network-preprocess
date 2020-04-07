@@ -116,9 +116,9 @@ for entry in indexData:
 		if(check_symmetric(adjacencyMatrix)):
 			directionMode=ig.ADJ_UPPER
 			weights = weights[np.triu_indices(weights.shape[0], k = 0)]
-		g = ig.Graph.Adjacency((adjacencyMatrix > 0).tolist(), directionMode)
+		g = ig.Graph.Adjacency((adjacencyMatrix != 0).tolist(), directionMode)
 		if(retainWeights):
-			g.es['weight'] = weights[weights > 0]
+			g.es['weight'] = weights[weights != 0]
 		
 		
 		with open(os.path.join(csvOutputDirectory,os.path.basename(outputFilename)), "w") as fd:
@@ -129,9 +129,9 @@ for entry in indexData:
 			
 			np.savetxt(fd,outputData,delimiter=",")
 
-with open(os.path.join(outputDirectory,"index,json"), "w") as fd:
+with open(os.path.join(outputDirectory,"index.json"), "w") as fd:
 	json.dump(indexData,fd)
 
-with open(os.path.join(outputDirectory,"label,json"), "w") as fd:
+with open(os.path.join(outputDirectory,"label.json"), "w") as fd:
 	json.dump(labelData,fd)
 
