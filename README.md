@@ -15,7 +15,6 @@ Used to preprocess connectivity/similarity matrices (conmat) and generate a filt
 
 
 ### Citations
-Please cite the following articles when publishing papers that used data, code or other resources created by the brainlife.io community.
 
 1. Bassett, Danielle S., and Olaf Sporns. "Network neuroscience." Nature neuroscience 20, no. 3 (2017): 353. [https://doi.org/10.1038/nn.4502](https://doi.org/10.1038/nn.4502)
 
