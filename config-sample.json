@@ -4,5 +4,5 @@
     "csv": "data/csv",
     "transform":"separated",
     "retain-weights":true,
-    "threshold": null
+    "threshold": 0.2
 }
