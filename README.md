@@ -1,7 +1,7 @@
 [![Abcdspec-compliant](https://img.shields.io/badge/ABCD_Spec-v1.1-green.svg)](https://github.com/brain-life/abcd-spec)
 [![Run on Brainlife.io](https://img.shields.io/badge/Brainlife-bl.app.1-blue.svg)](https://doi.org/10.25663/brainlife.app.289)
 
-# app-example-documentation
+# Network Preprocess
 Used to preprocess connectivity/similarity matrices (conmat) and generate a filtered version of the network, which can be directed or undirected, weighted or unweighted.
 
 ### Authors
@@ -10,7 +10,7 @@ Used to preprocess connectivity/similarity matrices (conmat) and generate a filt
 <!-- ### Contributors
 - Franco Pestilli (franpest@indiana.edu) -->
 
-### Funding 
+<!-- ### Funding  -->
 <!-- [![NSF-BCS-1734853](https://img.shields.io/badge/NSF_BCS-1734853-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1734853) -->
 
 
