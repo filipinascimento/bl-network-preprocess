@@ -46,6 +46,7 @@ with open(configFilename, "r") as fd:
 # "keep-zero-weights": false
 
 class transformType(Enum):
+	none = 0
 	absolute = 1
 	positive = 2
 	negative = 3
@@ -71,6 +72,8 @@ if("selection-transform" in config):
 		selectionTransform = transformType.positive
 	elif(config["selection-transform"].lower() == "negative"):
 		selectionTransform = transformType.negative
+	elif(config["selection-transform"].lower() == "none"):
+		selectionTransform = transformType.none
 
 if(selectionTransform is None):
 	if(transform == transformType.layered):
