@@ -1,5 +1,5 @@
 FROM debian:latest
-MAINTAINER Conda Development Team <conda@continuum.io>
+MAINTAINER Filipi N Silva <filipinascimento@gmail.com>
 
 ADD environment.yml /tmp/environment.yml
 # RUN conda env create -f /tmp/environment.yml

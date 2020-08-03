@@ -1,8 +1,7 @@
 {
-    "index": "data/index.json",
-    "label": "data/label.json",
-    "csv": "data/csv",
-    "transform":"separated",
+    "network": "data/network.json.gz",
+    "transform":"absolute",
     "retain-weights":true,
-    "threshold": 0.2
+    "threshold": 0.1,
+    "percentile": 0.5
 }

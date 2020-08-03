@@ -2,7 +2,7 @@
 [![Run on Brainlife.io](https://img.shields.io/badge/Brainlife-bl.app.1-blue.svg)](https://doi.org/10.25663/brainlife.app.289)
 
 # Network Preprocess
-Used to preprocess connectivity/similarity matrices (conmat) and generate a filtered version of the network, which can be directed or undirected, weighted or unweighted.
+App to preprocess networks and generate a filtered version of it, which can be directed or undirected, weighted or unweighted.
 
 ### Authors
 - [Filipi N. Silva](filsilva@iu.edu)
@@ -10,8 +10,9 @@ Used to preprocess connectivity/similarity matrices (conmat) and generate a filt
 <!-- ### Contributors
 - Franco Pestilli (franpest@indiana.edu) -->
 
-<!-- ### Funding  -->
-<!-- [![NSF-BCS-1734853](https://img.shields.io/badge/NSF_BCS-1734853-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1734853) -->
+### Funding
+[![NIH-1R01EB029272-01](https://img.shields.io/badge/NIH-1R01EB029272_01-blue.svg)](https://www.nibib.nih.gov/node/113361)
+
 
 
 ### Citations
