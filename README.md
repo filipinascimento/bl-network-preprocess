@@ -50,6 +50,8 @@ mv config-sample.json config.json
 ./main
 ```
 
+The `filsilva/cxnetwork` ( [https://github.com/filipinascimento/cxnetworks-docker](https://github.com/filipinascimento/cxnetworks-docker) ) docker image is being used.
+
 ### Sample Datasets
 
 A sample dataset is provided in folder `data` and `config-sample.json`
