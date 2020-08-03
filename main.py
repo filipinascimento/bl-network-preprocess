@@ -2,15 +2,15 @@
 
 import sys
 import os.path
+from enum import Enum
+from os.path import join as PJ
+from collections import OrderedDict
 import re
 import json
 import numpy as np
 from tqdm import tqdm
 import igraph as ig
-
-
-def check_symmetric(a, rtol=1e-05, atol=1e-08):
-	return np.allclose(a, a.T, rtol=rtol, atol=atol)
+import jgf
 
 def isFloat(value):
 	if(value is None):
@@ -21,44 +21,67 @@ def isFloat(value):
 	except ValueError:
 		return False
 
-def loadCSVMatrix(filename):
-	return np.loadtxt(filename,delimiter=",")
-
-
 configFilename = "config.json"
 argCount = len(sys.argv)
 if(argCount > 1):
 		configFilename = sys.argv[1]
 
 outputDirectory = "output"
-csvOutputDirectory = os.path.join(outputDirectory, "csv")
+outputFile = PJ(outputDirectory,"network.json.gz")
 
 if(not os.path.exists(outputDirectory)):
 		os.makedirs(outputDirectory)
 
-if(not os.path.exists(csvOutputDirectory)):
-		os.makedirs(csvOutputDirectory)
-
 with open(configFilename, "r") as fd:
 		config = json.load(fd)
 
-# "index": "data/index.json",
-# "label": "data/label.json",
-# "csv": "data/csv",
-# "transform":"absolute", //"absolute" or "signed"
+
+# "network":"data/network.json.gz"
+# "transform":"absolute", //"absolute", "positive", "negative", "layered"
 # "retain-weights":false,
 # "threshold": "none"
+# "percentile": "none"
+# "strict-percentile": false
+# "selection-transform": "none" //"none","absolute", "positive", "negative"
+# "keep-zero-weights": false
 
-indexFilename = config["index"]
-labelFilename = config["label"]
-CSVDirectory = config["csv"]
+class transformType(Enum):
+	none = 0
+	absolute = 1
+	positive = 2
+	negative = 3
+	layered = 4
 
-useAbsoluteValue = False
-useSeparatedSigned = False
-if(config["transform"].lower() == "absolute"):
-	useAbsoluteValue = True
-elif(config["transform"].lower() == "separated"):
-	useSeparatedSigned = True
+
+transform = None
+if("transform" in config):
+	if(config["transform"].lower() == "absolute"):
+		transform = transformType.absolute
+	elif(config["transform"].lower() == "positive"):
+		transform = transformType.positive
+	elif(config["transform"].lower() == "negative"):
+		transform = transformType.negative
+	elif(config["transform"].lower() == "layered"):
+		transform = transformType.layered
+
+selectionTransform = None
+if("selection-transform" in config):
+	if(config["selection-transform"].lower() == "absolute"):
+		selectionTransform = transformType.absolute
+	elif(config["selection-transform"].lower() == "positive"):
+		selectionTransform = transformType.positive
+	elif(config["selection-transform"].lower() == "negative"):
+		selectionTransform = transformType.negative
+	elif(config["selection-transform"].lower() == "none"):
+		selectionTransform = transformType.none
+
+if(selectionTransform is None):
+	if(transform == transformType.layered):
+		selectionTransform = transformType.absolute
+	else:
+		selectionTransform = transform
+
+
 
 useThreshold = False
 threshold = 0.0
@@ -66,72 +89,92 @@ if("threshold" in config and isFloat(config["threshold"])):
 	useThreshold=True
 	threshold = float(config["threshold"])
 
+usePercentile = False
+percentile = 0.0
+if("percentile" in config and isFloat(config["percentile"])):
+	usePercentile=True
+	percentile = float(config["percentile"])
+
+	strictPercentile = False
+	if("strict-percentile" in config and config["strict-percentile"] is not None):
+		strictPercentile = config["strict-percentile"]
+
+
 retainWeights = False
-if("retain-weights" in config and config["retain-weights"]):
-	retainWeights = True
-
-with open(indexFilename, "r") as fd:
-	indexData = json.load(fd)
-
-with open(labelFilename, "r") as fd:
-	labelData = json.load(fd)
+if("retain-weights" in config and config["retain-weights"] is not None):
+	retainWeights = config["retain-weights"]
 
 
-for entry in indexData:
-	entryFilename = entry["filename"]
-
-	alreadySigned = ("separated-sign" in entry) and entry["separated-sign"]
-
-	#inputfile,outputfile,signedOrNot
-	filenames = [(entryFilename,entryFilename,False)]
-	baseName,extension = os.path.splitext(entryFilename)
-
-	if(alreadySigned):
-		filenames += [(baseName+"_negative%s"%(extension),baseName+"_negative%s"%(extension),False)]
-	elif(useSeparatedSigned):
-		filenames += [(entryFilename,baseName+"_negative%s"%(extension),True)]
-		entry["separated-sign"] = True
-
-	if("null-models" in entry):
-		nullCount = int(entry["null-models"])
-		filenames += [(baseName+"-null_%d%s"%(i,extension),baseName+"-null_%d%s"%(i,extension),False) for i in range(nullCount)]
-		if(alreadySigned):
-			filenames += [(baseName+"_negative-null_%d%s"%(i,extension),baseName+"_negative-null_%d%s"%(i,extension),False) for i in range(nullCount)]
-		elif(useSeparatedSigned):
-			filenames += [(baseName+"-null_%d%s"%(i,extension),baseName+"_negative-null_%d%s"%(i,extension),True) for i in range(nullCount)]
+keepZeroWeight = False
+if("keep-zero-weights" in config and config["keep-zero-weights"] is not None):
+	keepZeroWeight = config["keep-zero-weights"]
 
 
-	for filename,outputFilename,signed in tqdm(filenames):
-		adjacencyMatrix = loadCSVMatrix(os.path.join(CSVDirectory, filename))
-		directionMode=ig.ADJ_DIRECTED
-		if(signed):
-			adjacencyMatrix = -adjacencyMatrix
-		if(useSeparatedSigned):
-			adjacencyMatrix[adjacencyMatrix<=0] = 0
-		if(useAbsoluteValue):
-			adjacencyMatrix = np.abs(adjacencyMatrix)
+networks = jgf.igraph.load(config["network"],compressed=True)
+
+outputNetworks = []
+for network in networks:
+	originalEdgeCount = network.ecount()
+	if("weight" in network.edge_attributes() and originalEdgeCount>0):
+		
+		if(transform == transformType.absolute):
+			weights = np.abs(network.es["weight"])
+		elif(transform == transformType.positive):
+			weights = np.array(network.es["weight"])
+			weights[weights<0] = 0
+		elif(transform == transformType.negative):
+			weights = -np.array(network.es["weight"])
+			weights[weights<0] = 0
+		else:
+			weights = np.array(network.es["weight"])
+		
+		
+		if(selectionTransform == transformType.absolute):
+			selectionWeights = np.abs(network.es["weight"])
+		elif(selectionTransform == transformType.positive):
+			selectionWeights = np.array(network.es["weight"])
+			selectionWeights[selectionWeights<0] = 0
+		elif(selectionTransform == transformType.negative):
+			selectionWeights = -np.array(network.es["weight"])
+			selectionWeights[selectionWeights<0] = 0
+		else:
+			selectionWeights = np.array(network.es["weight"])
+		
+
+		if(not keepZeroWeight):
+			edgesSelection = (weights!=0)+(selectionWeights!=0)
+		else:
+			edgesSelection = np.ones(originalEdgeCount,dtype=np.bool)
+
+		
 		if(useThreshold):
-			adjacencyMatrix[adjacencyMatrix<=threshold] = 0
-		weights = adjacencyMatrix
-		if(check_symmetric(adjacencyMatrix)):
-			directionMode=ig.ADJ_UPPER
-			weights = weights[np.triu_indices(weights.shape[0], k = 0)]
-		g = ig.Graph.Adjacency((adjacencyMatrix != 0).tolist(), directionMode)
+			edgesSelection *= (selectionWeights>=threshold)
+		
+		remainingEdgesCount = np.sum(edgesSelection)
+
+		if(usePercentile and remainingEdgesCount>0):
+				if(strictPercentile):
+						sortedIndices = sorted(np.arange(originalEdgeCount), key=lambda i: selectionWeights[i],reverse=True)
+						topIndices = sortedIndices[int(round((1.0-percentile)*remainingEdgesCount)):]
+						edgesPercentileSelection = np.zeros(originalEdgeCount,dtype=np.bool)
+						edgesPercentileSelection[topIndices] = True
+						edgesSelection *= edgesPercentileSelection
+				else:
+					quantileThreshold = np.quantile(selectionWeights[edgesSelection],1.0-percentile)
+					edgesSelection *= (selectionWeights>=quantileThreshold)
+		
+		edgesToBeRemoved = np.where(~edgesSelection)[0]
+
+		if(transform == transformType.layered):
+			network.es["layer"] = [0 if weight>0 else 1 for weight in weights]
+		
 		if(retainWeights):
-			g.es['weight'] = weights[weights != 0]
-		
-		
-		with open(os.path.join(csvOutputDirectory,os.path.basename(outputFilename)), "w") as fd:
-			if(retainWeights):
-				outputData = g.get_adjacency(attribute='weight').data
-			else:
-				outputData = g.get_adjacency().data
+			network.es["weight"] = weights
+		else:
+			del network.es["weight"]
 			
-			np.savetxt(fd,outputData,delimiter=",")
+		network.delete_edges(edgesToBeRemoved)
 
-with open(os.path.join(outputDirectory,"index.json"), "w") as fd:
-	json.dump(indexData,fd)
+	outputNetworks.append(network)
 
-with open(os.path.join(outputDirectory,"label.json"), "w") as fd:
-	json.dump(labelData,fd)
-
+jgf.igraph.save(outputNetworks,outputFile,compressed=True)
