@@ -165,9 +165,16 @@ for network in networks:
 		
 		edgesToBeRemoved = np.where(~edgesSelection)[0]
 
+		# layer
 		if(transform == transformType.layered):
-			network.es["layer"] = [0 if weight>0 else 1 for weight in weights]
-		
+			network.es["layer"] = ["positive" if weight>0 else "negative" for weight in weights]
+			network["edge-layer-weights"] = OrderedDict([
+					("positive",1),
+					("negative",-1)
+				]
+			)
+			weights = np.abs(network.es["weight"])
+
 		if(retainWeights):
 			network.es["weight"] = weights
 		else:
