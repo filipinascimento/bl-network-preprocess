@@ -5,15 +5,14 @@
 App to preprocess networks and generate a filtered version of it, which can be directed or undirected, weighted or unweighted.
 
 ### Authors
-- [Filipi N. Silva](filsilva@iu.edu)
+- [Filipi N. Silva](https://filipinascimento.github.io)
 
-<!-- ### Contributors
-- Franco Pestilli (franpest@indiana.edu) -->
+### Contributors
+- [Franco Pestilli](https://liberalarts.utexas.edu/psychology/faculty/fp4834)
+
 
 ### Funding
-[![NIH-1R01EB029272-01](https://img.shields.io/badge/NIH-1R01EB029272_01-blue.svg)](https://www.nibib.nih.gov/node/113361)
-
-
+[![NIH-1R01EB029272-01](https://img.shields.io/badge/NIH-1R01EB029272_01-blue.svg)](https://projectreporter.nih.gov/project_info_description.cfm?aid=9916138&icde=52173380&ddparam=&ddvalue=&ddsub=&cr=1&csb=default&cs=ASC&pball=)
 
 ### Citations
 
