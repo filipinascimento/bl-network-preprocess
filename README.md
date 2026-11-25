@@ -2,6 +2,54 @@
 [![Run on Brainlife.io](https://img.shields.io/badge/Brainlife-bl.app.1-blue.svg)](https://doi.org/10.25663/brainlife.app.289)
 
 # Network Preprocess
+
+<!-- brainlife-app:begin (generated from the App manifest; edit the manifest, not this block) -->
+
+> **Filters a connectivity network by weight sign, threshold and top-percentile edges and outputs the preprocessed network, weighted or binarised.**
+
+Python utility for network analysis. It transforms edge weights by sign (absolute, positive or negative), removes edges under a threshold and/or keeps a top percentile of edges, optionally keeping weights. Use it to sparsify connectivity matrices before computing network measures.
+
+| | |
+|---|---|
+| 📥 **Inputs** | `generic/network` |
+| 📤 **Outputs** | `generic/network` |
+| 🐳 **Container** | `filsilva/cxnetwork:0.2.0` |
+| ⚙️ **Resources** | 1 CPUs |
+| 🔗 **Run it** | [doi.org/10.25663/brainlife.app.289](https://doi.org/10.25663/brainlife.app.289) |
+
+#### 📥 Inputs
+
+| Input | Datatype | Required | Description |
+|---|---|---|---|
+| `network` | `generic/network` | yes | Input network files to preprocess. |
+
+#### 📤 Outputs
+
+| Output | Datatype | Description |
+|---|---|---|
+| `output` | `generic/network` | Resulting preprocessed networks. |
+
+<details>
+<summary><b>⚙️ Parameters</b> (7)</summary>
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `transform` | enum | `absolute` | Choose how to handle the sign of the weights. Absolute: Uses the absolute value of entries as weights. Positive: Uses only positive weights. Negative: Set all negative weights to positive, and positive to zero weight. Layered: Keep weights unchanged but adds separated layers for negative and positive. None : Makes no changes to the signs of entries. Options: `absolute`, `positive`, `negative`, `layered`, `none`. |
+| `retain-weights` | boolean | `false` | Retain weights values after filtering (If not enabled, the resulting networks are unweighed.) |
+| `threshold` | number |  | If a value is provided, all edges weighting less than threshold are removed. |
+| `percentile` | number |  | Percentile of top edges to be kept in the network after thresholding edges. |
+| `selection-transform` | enum | `same` | . Absolute: Uses the absolute value of entries as weights. Positive: Uses only positive weights. Negative: Set all negative weights to positive, and positive to zero weight. None : Makes no changes to the signs of entries. Same: Use same transformation as transform. Options: `absolute`, `positive`, `negative`, `none`, `same`. |
+| `strict-percentile` | boolean | `false` | Apply the percentile filter based on the order of weights. |
+| `keep-zero-weights` | boolean | `false` | Keep edges with weight zero before threshold and percentile filtering. |
+
+</details>
+
+📚 **References used by this App:**
+- Avesani P, et al. The open diffusion data derivatives, brain data upcycling via integrated publishing of derivatives and reproducible open cloud services. Sci Data 6:69 (2019). [doi:10.1038/s41597-019-0073-y](https://doi.org/10.1038/s41597-019-0073-y)
+- Bassett DS, Sporns O. Network neuroscience. Nat Neurosci 20(3):353 (2017). [doi:10.1038/nn.4502](https://doi.org/10.1038/nn.4502)
+
+<!-- brainlife-app:end -->
+
 App to preprocess networks and generate a filtered version of it, which can be directed or undirected, weighted or unweighted.
 
 ### Authors
